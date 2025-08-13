@@ -7,6 +7,5 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
-  // 👇 중요: 프로젝트 페이지는 /<repo>/ 로 base 지정
-  base: "/myprofile/",
+  base: "/myprofile/", // ← 중요
 });
