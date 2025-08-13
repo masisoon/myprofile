@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/ui/card";
 import { Badge } from "@/ui/badge";
 import { Progress } from "@/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/ui/tabs";
+
 const profile = {
   name: "송 택부",
   role: "Backend Engineer",
@@ -35,9 +36,7 @@ const skills = {
     { name: "AWS EC2 / S3 / RDS", level: 10 },
     { name: "GitHub Actions (CI/CD)", level: 25 },
   ],
-  plus: [
-  
-  ],
+  plus: [],
 };
 
 const strengths = [
@@ -55,6 +54,7 @@ const stacks = [
   { label: "Docker", category: "Ops" },
   { label: "GitHub Actions", category: "CI/CD" },
 ];
+
 const experiences = [
   {
     period: "2025.07.13 - 2025.07.29",
@@ -80,21 +80,53 @@ const experiences = [
   },
 ];
 
+// ===== 경험별 트러블슈팅 정의 (title 매칭) =====
+type ExperienceTrouble = {
+  title: string;
+  context: string;
+  action: string;
+  result: string;
+};
+
+const experienceTroubles: Record<string, ExperienceTrouble[]> = {
+  "PortPilot 프로젝트": [
+    {
+      title: "정적 리소스 404",
+      context: "업로드 이미지가 /image-files 경로에서 404",
+      action: "정적 리소스 핸들러 매핑 추가, 캐시 헤더 조정, 업로드 루트 권한 점검",
+      result: "가용성 100% 확보, 통합테스트 케이스 추가로 회귀 방지",
+    },
+    {
+      title: "권한 경계 불명확",
+      context: "참여요청 승인 로직에서 Role/Owner 경계 혼재",
+      action: "도메인 서비스로 전이 규칙 캡슐화, @PreAuthorize 및 PoLP 적용",
+      result: "오작동 0건, 코드리뷰 시간 30% 단축",
+    },
+    {
+      title: "외래키 제약 위반",
+      context: "연관 삭제 시 참조 무결성 위반으로 500 발생",
+      action: "삭제 순서 및 orphanRemoval 재설계, 트랜잭션 경계 정리",
+      result: "정합성 확보, 예외 재현 테스트 추가",
+    },
+  ],
+};
+
 const projects = [
   {
     name: "PortPilot",
     brief: "개발자 프로필/프로젝트 매칭 플랫폼",
     tech: ["Spring Boot", "JPA", "MySQL", "Thymeleaf", "Docker"],
+    contrib: { design: 90, build: 80, ops: 10 },
     links: [
       { text: "GitHub", href: "https://github.com/prgrms-aibe-devcourse/AIBE2-Project2-Team4" },
       { text: "Wireframe", href: "https://www.figma.com/design/NhvGnsoLlQsHxAopfi2Cg9/%ED%8F%AC%ED%8A%B8%ED%8C%8C%EC%9D%BC%EB%9F%BF-%EC%99%80%EC%9D%BC%EB%93%9C%ED%94%84%EB%A0%88%EC%9E%84?node-id=0-1&p=f&t=cpguFoeYAV5eer8j-0" },
       { text: "WBS", href: "https://docs.google.com/spreadsheets/d/1k5PClh23UvpvLJ76ZF6iR1Jsn9lUyUfxPH6XG3CF1Ho/edit?gid=0#gid=0" },
       { text: "PPT", href: "https://www.canva.com/design/DAGufdxskRk/CdIP_POjARnQRO19Emo86A/edit" }
     ],
-      
     impact: [
       "이미지 서빙 404 이슈 해결로 리소스 가용성 100%",
       "참여 요청 승인 프로세스 정립 (상태 전이 규칙)",
+      "프로필/포트폴리오/프로젝트 도메인 설계 및 API 안정화",
     ],
   },
 ];
@@ -105,9 +137,7 @@ const highlights = [
   { title: "배포 효율화", value: "↑ 40%", desc: "CI/CD 파이프라인 최적화로 리드타임 단축" },
 ];
 
-
-
-  // 메인 컴포넌트
+// 메인 컴포넌트
 export default function DevCapabilityPage() {
   const [tab, setTab] = useState("skills");
 
@@ -171,7 +201,6 @@ export default function DevCapabilityPage() {
             </Card>
           </motion.div>
 
-
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -196,7 +225,7 @@ export default function DevCapabilityPage() {
                   <Mail className="h-4 w-4" /> {profile.email}
                 </div>
                 <div className="flex items-center gap-2">
-                  <LinkIcon className="h-4 w-4" /> LinkedIn / GitHub 링크 추가
+                  <LinkIcon className="h-4 w-4" /> LinkedIn / GitHub 링크 추가 예정
                 </div>
               </CardContent>
             </Card>
@@ -281,6 +310,25 @@ export default function DevCapabilityPage() {
                     <ul className="list-disc pl-5 space-y-1 text-slate-700">
                       {e.bullets.map((b, i) => <li key={i}>{b}</li>)}
                     </ul>
+
+                    {/* PortPilot 등 title 매칭 시 하단에 Troubleshooting 표시 */}
+                    {experienceTroubles[e.title] && (
+                      <div className="mt-4 rounded-xl border bg-white p-4">
+                        <div className="text-sm font-semibold mb-2">Troubleshooting</div>
+                        <div className="grid md:grid-cols-3 gap-3">
+                          {experienceTroubles[e.title].map((t, i2) => (
+                            <div key={i2} className="text-sm">
+                              <div className="font-medium">{t.title}</div>
+                              <ul className="list-disc pl-4 mt-1 space-y-0.5 text-slate-700">
+                                <li><span className="font-semibold">문맥:</span> {t.context}</li>
+                                <li><span className="font-semibold">조치:</span> {t.action}</li>
+                                <li><span className="font-semibold">결과:</span> {t.result}</li>
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -307,6 +355,22 @@ export default function DevCapabilityPage() {
                     <ul className="list-disc pl-5 space-y-1 text-slate-700 mb-4">
                       {p.impact.map((it, k) => <li key={k}>{it}</li>)}
                     </ul>
+
+                    <div className="space-y-2 mt-3">
+                      {[
+                        { label: "설계", value: p.contrib?.design ?? 0 },
+                        { label: "구현", value: p.contrib?.build ?? 0 },
+                        { label: "운영", value: p.contrib?.ops ?? 0 },
+                      ].map((c, idx2) => (
+                        <div key={idx2}>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span>{c.label}</span><span>{c.value}%</span>
+                          </div>
+                          <Progress value={c.value} className="h-1.5" />
+                        </div>
+                      ))}
+                    </div>
+
                     <div className="flex gap-3 flex-wrap">
                       {p.links.map((l, m) => (
                         <Button key={m} size="sm" variant="secondary" className="rounded-full" asChild>
