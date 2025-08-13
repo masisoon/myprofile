@@ -7,5 +7,5 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
-  base: "/myprofile/", // ← 중요
+  base: "/myprofile/", 
 });
